@@ -27,7 +27,7 @@ const USER = urlParams.get("user") || "kadavernl";
 
 // Default query tries creator:(username). If that yields 0, change to something else:
 // e.g. (collection:opensource_movies AND creator:(...)) OR uploader:(your@email.com)
-const DEFAULT_QUERY = urlParams.get("q") || `creator:(${USER})`;
+const DEFAULT_QUERY = urlParams.get("q") || `uploader:(${USER})`;
 
 const FIELDS = (urlParams.get("fields") || "identifier,title,mediatype,date,description,downloads,creator")
   .split(",")
