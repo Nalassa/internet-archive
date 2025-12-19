@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kadavernl • Internet Archive Gallery</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="logo">⌁</div>
+      <div>
+        <h1 id="pageTitle">Kadavernl</h1>
+        <p class="sub">Auto-generated gallery from Internet Archive search</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <input id="searchInput" type="search" placeholder="Filter titles/descriptions…" />
+      <select id="typeSelect" title="Filter by media type">
+        <option value="">All types</option>
+        <option value="movies">Movies</option>
+        <option value="audio">Audio</option>
+        <option value="texts">Texts</option>
+        <option value="image">Image</option>
+        <option value="software">Software</option>
+        <option value="data">Data</option>
+        <option value="collection">Collections</option>
+      </select>
+
+      <button id="refreshBtn" class="btn">Refresh</button>
+      <button id="loadMoreBtn" class="btn btnPrimary">Load more</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="metaBar">
+      <div id="status" class="status">Ready.</div>
+      <div class="pillRow">
+        <span class="pill" id="countPill">0 items</span>
+        <span class="pill" id="queryPill">q: …</span>
+      </div>
+    </section>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
+
+    <section id="empty" class="empty hidden">
+      <h2>No items shown</h2>
+      <p>Try changing the query or removing filters.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="hint">
+      Tip: you can override config via URL:
+      <code>?user=kadavernl</code> or <code>?q=creator:(kadavernl)</code>
+    </div>
+  </footer>
+
+  <dialog id="embedDialog" class="dialog">
+    <form method="dialog" class="dialogInner">
+      <div class="dialogTop">
+        <strong>Embed code</strong>
+        <button class="btn" value="cancel">Close</button>
+      </div>
+      <textarea id="embedTextarea" readonly></textarea>
+      <div class="dialogActions">
+        <button id="copyEmbedBtn" class="btn btnPrimary" type="button">Copy</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
