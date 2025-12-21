@@ -28,11 +28,34 @@ const helpDialog = document.getElementById("helpDialog");
 // ===========================
 const MEDIA = [
   // Internet Archive examples:
-  // { ia: "plan-c-2012", title: "Plan C (2012)", desc: "My video", tags: ["skate", "edit"] },
-  // { ia: "https://archive.org/details/plan-c-2012", title: "Plan C (2012)" },
 
   // Direct file example:
   // { url: "https://example.com/myvideo.mp4", title: "My hosted MP4", type: "video", tags: ["demo"] },
+
+const MEDIA = [
+    { ia: "plan-c-2012", title: "Plan C (2012)", desc: "My video", tags: ["skate", "edit"] },
+  { ia: "https://archive.org/details/plan-c-2012", title: "Plan C (2012)" },
+  {
+    ia: "roddelpraat-archief",
+    title: "Roddelpraat Archief",
+    type: "video",
+    tags: ["roddelpraat", "archive"]
+  },
+  {
+    ia: "jans-reviews-2025",
+    title: "Jan's Reviews (2025)",
+    type: "video",
+    tags: ["reviews", "2025"]
+  },
+  {
+    ia: "lil-peep-everybodys-everything_202512",
+    title: "Lil Peep — Everybody's Everything (202512)",
+    type: "video",
+    tags: ["music", "documentary"]
+  }
+];
+
+  
 ];
 
 // ===========================
