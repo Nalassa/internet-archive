@@ -273,4 +273,174 @@ function matchesFilters(it) {
 function typeBadge(type) {
   const t = (type || "other").toLowerCase();
   if (t === "video") return "video";
-  if (t === "aud
+  if (t === "audio") return "audio";
+  if (t === "image") return "image";
+  return "other";
+}
+
+function render() {
+  grid.innerHTML = "";
+  const visible = normalized.filter(matchesFilters);
+  emptyEl.classList.toggle("hidden", visible.length !== 0);
+  countPill.textContent = `${visible.length} shown • ${normalized.length} total`;
+
+  for (const it of visible) {
+    const badge = typeBadge(it.type);
+    const title = it.title || "Untitled";
+    const desc = it.desc || "";
+    const tags = Array.isArray(it.tags) ? it.tags : [];
+
+    const hasThumb = !!it.thumb;
+    const thumbHtml = hasThumb
+      ? `<img loading="lazy" src="${esc(it.thumb)}" alt="${esc(title)}">`
+      : `<div style="width:100%;height:100%;display:grid;place-items:center;color:rgba(231,233,238,.6);font-weight:700;">NO THUMB</div>`;
+
+    const card = document.createElement("article");
+    card.className = "card";
+
+    const direct = it.directUrl || "";
+    const details = it.detailsUrl || "";
+    const size = it.sizeLabel ? ` • ${esc(it.sizeLabel)}` : "";
+
+    card.innerHTML = `
+      <div class="thumb">
+        ${thumbHtml}
+        <div class="badge">${esc(badge)}${size}</div>
+      </div>
+
+      <div class="body">
+        <div class="title">
+          <span title="${esc(title)}">${esc(title)}</span>
+          ${tags.length ? `<span class="smallTag">${esc(tags[0])}${tags.length > 1 ? ` +${tags.length - 1}` : ""}</span>` : ""}
+        </div>
+
+        <div class="meta">
+          <span>${it.source === "ia" ? "Internet Archive" : "Direct link"}</span>
+          ${direct ? `<span>✓ direct found</span>` : `<span style="color:rgba(255,77,109,.9)">no direct file</span>`}
+        </div>
+
+        <div class="desc" title="${esc(desc)}">${esc(desc)}</div>
+      </div>
+
+      <div class="actions">
+        ${direct ? `<button class="btn btnTiny" data-action="play" data-id="${esc(it._id)}">Play</button>` : ""}
+        ${direct ? `<a class="btn btnTiny" href="${esc(direct)}" target="_blank" rel="noopener">Download</a>` : ""}
+        ${details ? `<a class="btn btnTiny" href="${esc(details)}" target="_blank" rel="noopener">Details</a>` : ""}
+      </div>
+    `;
+
+    grid.appendChild(card);
+  }
+}
+
+// ===========================
+// Player
+// ===========================
+function openPlayer(it) {
+  const direct = it.directUrl;
+  const details = it.detailsUrl || direct || "#";
+
+  playerTitle.textContent = it.title || "Player";
+  playerDetails.href = details;
+  playerDirect.href = direct || details;
+  playerDownload.href = direct || details;
+
+  // Reset
+  playerVideo.pause();
+  playerVideo.removeAttribute("src");
+  playerVideo.load();
+  playerFallback.classList.add("hidden");
+
+  if (!direct) {
+    playerFallback.classList.remove("hidden");
+    playerDialog.showModal();
+    return;
+  }
+
+  // If browser can likely play it, use <video>; otherwise show fallback with download
+  if (it.type === "video" && isPlayableInBrowser(direct)) {
+    playerVideo.src = direct;
+    playerVideo.load();
+  } else if (it.type === "audio") {
+    // Use <video> as a player for audio too (works fine)
+    playerVideo.src = direct;
+    playerVideo.load();
+  } else if (it.type === "image") {
+    // Not a media player use-case — open direct instead
+    window.open(direct, "_blank", "noopener");
+    return;
+  } else {
+    playerFallback.classList.remove("hidden");
+  }
+
+  playerDialog.showModal();
+}
+
+// ===========================
+// Boot
+// ===========================
+function attachIds() {
+  // stable internal IDs for click actions
+  normalized = normalized.map((it, idx) => ({ ...it, _id: it._id || `m_${idx}_${Math.random().toString(16).slice(2)}` }));
+}
+
+async function loadAll() {
+  if (loading) return;
+  loading = true;
+  setStatus("Loading items…");
+
+  try {
+    const out = [];
+    for (let i = 0; i < MEDIA.length; i++) {
+      const src = MEDIA[i];
+      try {
+        const norm = await normalizeItem(src);
+        out.push(norm);
+        setStatus(`Loaded ${i + 1}/${MEDIA.length}…`);
+      } catch (e) {
+        out.push({ title: src.title || "Error", desc: String(e.message || e), type: "other", source: "error", raw: src });
+      }
+    }
+
+    normalized = out;
+    attachIds();
+    render();
+
+    if (normalized.length === 0) setStatus("No items yet. Add entries in MEDIA in app.js.");
+    else setStatus(`Ready. Loaded ${normalized.length} items.`);
+  } catch (e) {
+    console.error(e);
+    setStatus(`Error: ${e.message}`);
+  } finally {
+    loading = false;
+  }
+}
+
+// Events
+searchInput.addEventListener("input", render);
+typeSelect.addEventListener("change", render);
+
+reloadBtn.addEventListener("click", loadAll);
+
+helpBtn.addEventListener("click", () => helpDialog.showModal());
+
+grid.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+
+  const it = normalized.find(x => x._id === id);
+  if (!it) return;
+
+  if (action === "play") openPlayer(it);
+});
+
+// Safety: stop playback when closing dialog
+playerDialog.addEventListener("close", () => {
+  try { playerVideo.pause(); } catch {}
+});
+
+// Start
+loadAll();
