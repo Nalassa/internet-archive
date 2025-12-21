@@ -76,8 +76,8 @@ function json(obj, status = 200) {
 
 function pickBestFile(files) {
   const badExt = new Set(["srt","vtt","nfo","txt","json","xml","md","log","jpg","jpeg","png","gif","webp","avif","svg"]);
-  const playableFirst = ["mp4","webm","m4v","mov","ogv"];
-  const videoNext = ["mkv","avi"];
+  const playableFirst = ["mp4","webm","m4v","mov","ogv"]; // plays in browser
+  const videoNext = ["mkv","avi"]; // download fallback
   const audio = ["mp3","m4a","ogg","flac","wav"];
 
   const candidates = files
