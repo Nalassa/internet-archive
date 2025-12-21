@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kadavernl • Internet Archive Gallery</title>
+  <title>Kadavernl • Media Gallery</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,25 +12,22 @@
       <div class="logo">⌁</div>
       <div>
         <h1 id="pageTitle">Kadavernl</h1>
-        <p class="sub">Auto-generated gallery from Internet Archive search</p>
+        <p class="sub">Your own hosted media list (Internet Archive items supported)</p>
       </div>
     </div>
 
     <div class="controls">
-      <input id="searchInput" type="search" placeholder="Filter titles/descriptions…" />
-      <select id="typeSelect" title="Filter by media type">
-        <option value="">All types</option>
-        <option value="movies">Movies</option>
+      <input id="searchInput" type="search" placeholder="Search titles/tags…" />
+      <select id="typeSelect" title="Filter by type">
+        <option value="">All</option>
+        <option value="video">Video</option>
         <option value="audio">Audio</option>
-        <option value="texts">Texts</option>
         <option value="image">Image</option>
-        <option value="software">Software</option>
-        <option value="data">Data</option>
-        <option value="collection">Collections</option>
+        <option value="other">Other</option>
       </select>
 
-      <button id="refreshBtn" class="btn">Refresh</button>
-      <button id="loadMoreBtn" class="btn btnPrimary">Load more</button>
+      <button id="reloadBtn" class="btn">Reload</button>
+      <button id="helpBtn" class="btn btnPrimary">How to add items</button>
     </div>
   </header>
 
@@ -39,7 +36,7 @@
       <div id="status" class="status">Ready.</div>
       <div class="pillRow">
         <span class="pill" id="countPill">0 items</span>
-        <span class="pill" id="queryPill">q: …</span>
+        <span class="pill" id="sourcePill">source: local list</span>
       </div>
     </section>
 
@@ -47,26 +44,62 @@
 
     <section id="empty" class="empty hidden">
       <h2>No items shown</h2>
-      <p>Try changing the query or removing filters.</p>
+      <p>Try clearing search / filter, or add more items in <code>app.js</code>.</p>
     </section>
   </main>
 
   <footer class="foot">
     <div class="hint">
-      Tip: you can override config via URL:
-      <code>?user=kadavernl</code> or <code>?q=creator:(kadavernl)</code>
+      Tip: host this on GitHub Pages, Netlify, or just open the file locally.
     </div>
   </footer>
 
-  <dialog id="embedDialog" class="dialog">
+  <!-- Player dialog -->
+  <dialog id="playerDialog" class="dialog">
     <form method="dialog" class="dialogInner">
       <div class="dialogTop">
-        <strong>Embed code</strong>
+        <strong id="playerTitle">Player</strong>
         <button class="btn" value="cancel">Close</button>
       </div>
-      <textarea id="embedTextarea" readonly></textarea>
+
+      <div class="playerBox">
+        <video id="playerVideo" controls playsinline></video>
+        <div id="playerFallback" class="playerFallback hidden">
+          This file type may not play in your browser.
+          Use <a id="playerDownload" href="#" target="_blank" rel="noopener">Download</a>.
+        </div>
+      </div>
+
       <div class="dialogActions">
-        <button id="copyEmbedBtn" class="btn btnPrimary" type="button">Copy</button>
+        <a id="playerDetails" class="btn" href="#" target="_blank" rel="noopener">Details</a>
+        <a id="playerDirect" class="btn btnPrimary" href="#" target="_blank" rel="noopener">Open direct</a>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Help dialog -->
+  <dialog id="helpDialog" class="dialog">
+    <form method="dialog" class="dialogInner">
+      <div class="dialogTop">
+        <strong>How to add items</strong>
+        <button class="btn" value="cancel">Close</button>
+      </div>
+
+      <div class="helpText">
+        <p>Edit <code>MEDIA</code> in <code>app.js</code>.</p>
+        <ul>
+          <li><b>Internet Archive item</b>: use <code>{ ia: "plan-c-2012", title: "Plan C (2012)" }</code></li>
+          <li><b>IA details link also works</b>: <code>{ ia: "https://archive.org/details/plan-c-2012" }</code></li>
+          <li><b>Direct file</b>: <code>{ url: "https://example.com/video.mp4", title: "My Video" }</code></li>
+        </ul>
+        <p>
+          The script uses the IA metadata API to find real downloadable files.
+          It prefers MP4/WebM for playback and still provides a direct download for MKV/AVI.
+        </p>
+      </div>
+
+      <div class="dialogActions">
+        <button class="btn btnPrimary" value="cancel">Ok</button>
       </div>
     </form>
   </dialog>
